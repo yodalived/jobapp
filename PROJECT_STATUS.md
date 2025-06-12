@@ -3,22 +3,24 @@
 ## Project Overview
 Building an automated resume generation and job application tracking system with learning capabilities.
 
-## Current Phase: Initial Setup (Day 1)
+## Current Phase: Database Setup Complete (Day 1)
 - [x] Project structure created
 - [x] Python environment with Poetry
 - [x] Dependencies installed (FastAPI, SQLAlchemy, Celery, etc.)
 - [x] PostgreSQL and Redis running locally via Docker
 - [x] Environment configuration (.env)
 - [x] Basic config.py and database.py created
-- [ ] Database models
-- [ ] First API endpoint
-- [ ] Alembic migrations setup
+- [x] Database models created (JobApplication, Company, ResumeVersion, etc.)
+- [x] Alembic migrations configured and initial migration run
+- [x] Database tables successfully created
+- [ ] First API endpoints
 - [ ] Basic authentication
+- [ ] Resume template setup
 
 ## Architecture Decisions
 - **Language**: Python-only implementation (decided against Go hybrid for faster development)
 - **API**: FastAPI with async/await
-- **Database**: PostgreSQL with asyncpg
+- **Database**: PostgreSQL with asyncpg + psycopg2-binary (for migrations)
 - **Cache/Queue**: Redis with Celery
 - **Scraping**: Playwright (Selenium alternative)
 - **Resume Generation**: LaTeX templates with Jinja2
@@ -49,34 +51,35 @@ Existing K8s cluster with:
 - n8n (workflow automation)
 - Prometheus & Grafana
 
-## Database Schema Plans
-- job_applications table (main tracking)
-- resume_versions table
-- companies table
-- application_questions table (for repeated questions)
-- scraping_runs table
+## Database Schema (COMPLETED)
+- job_applications table - Main tracking with status, scores, timestamps
+- application_status_history - Track status changes
+- application_notes - User notes on applications
+- companies table - Company information
+- resume_versions - Track different resume versions and performance
 
 ## Next Immediate Steps
-1. Create SQLAlchemy models in src/api/models/schema.py
-2. Set up Alembic for migrations
-3. Create basic CRUD endpoints
-4. Add JWT authentication
-5. Create first resume template
+1. Create FastAPI main.py with basic configuration
+2. Create CRUD operations for job applications
+3. Add authentication endpoints (JWT)
+4. Create first API router for applications
+5. Test endpoints with Postman/curl
+
+## Important Notes
+- Changed all 'metadata' columns to 'extra_data' (metadata is reserved in SQLAlchemy)
+- Using both asyncpg (for FastAPI) and psycopg2-binary (for Alembic)
+- Database URL format: postgresql://user:pass@host/db
 
 ## Questions/Blockers
-- None currently
+- None currently - database setup successful!
 
 ## Conversation History
-- Chat 1 (2024-12-19): Architecture planning, tech stack decisions, project structure setup
+- Chat 1 (2024-12-19): Architecture planning, tech stack decisions, project structure, database models, successful migration
 
 ## Commands Run So Far
 ```bash
-mkdir resume-automation && cd resume-automation
-python -m venv venv
-source venv/bin/activate
-pip install poetry
-poetry init
-poetry add fastapi uvicorn sqlalchemy asyncpg alembic pydantic pydantic-settings python-dotenv redis celery httpx playwright beautifulsoup4 jinja2 python-multipart passlib python-jose langchain openai
-poetry add --group dev pytest pytest-asyncio pytest-cov black ruff mypy ipython rich
-docker run --name resume-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=resume_db -p 5432:5432 -d postgres:15
-docker run --name resume-redis -p 6379:6379 -d redis:7-alpine
+# All previous commands plus:
+poetry add psycopg2-binary  # Added for Alembic sync operations
+poetry run alembic init alembic
+poetry run alembic revision --autogenerate -m "Initial models - job applications, companies, resumes"
+poetry run alembic upgrade head

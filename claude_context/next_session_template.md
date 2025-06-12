@@ -1,6 +1,3 @@
-## 4. claude_context/next_session_template.md
-
-```markdown
 # Template for Starting Next Claude Session
 
 ## Opening Message Template
@@ -9,57 +6,47 @@ I'm continuing work on my resume automation system in Python. Here's the current
 
 **Project**: Automated resume generation and job application tracking system
 
-**Current Structure**:
-resume-automation/
-├── src/
-│   ├── api/         # FastAPI application
-│   ├── core/        # Config and database setup
-│   ├── scraper/     # Job scraping (Playwright)
-│   ├── generator/   # Resume generation (LaTeX)
-│   ├── ml/          # Learning/analytics
-│   └── worker/      # Celery tasks
+**Completed So Far**:
+- Project structure with Poetry
+- PostgreSQL & Redis running in Docker
+- Database models (JobApplication, Company, ResumeVersion, etc.)
+- Alembic migrations configured and run
+- Tables successfully created in database
 
-￼
+**Current Database Schema**:
+- job_applications (main tracking)
+- application_status_history
+- application_notes
+- companies
+- resume_versions
 
-**Completed**:
-- Project structure
-- Dependencies (Poetry)
-- PostgreSQL & Redis (Docker)
-- config.py and database.py
-- Environment setup
+**Next Task**: Create FastAPI endpoints for CRUD operations on job applications
 
 **Tech Stack**:
 - FastAPI (async API)
-- PostgreSQL + SQLAlchemy
+- PostgreSQL + SQLAlchemy + Alembic
 - Redis + Celery
 - Playwright (scraping)
 - LangChain + OpenAI
 
-**Current Task**: [FILL IN CURRENT TASK]
+**Current Working Directory Structure**:
+src/
+├── api/
+│   ├── models/
+│   │   ├── schema.py   # SQLAlchemy models
+│   │   └── schemas.py  # Pydantic models
+│   └── main.py        # Need to create this
+├── core/
+│   ├── config.py      # Settings
+│   └── database.py    # DB connection
 
-**Specific Question**: [FILL IN SPECIFIC QUESTION]
+**Specific Question**: [FILL IN]
 
-[PASTE RELEVANT CODE OR ERROR]
+[PASTE ANY RELEVANT CODE OR ERRORS]
 
-## Key Context Points to Mention
-
-1. Building Python-only (no Go)
-2. Have existing K8s cluster for deployment
-3. Starting with LinkedIn Easy Apply
-4. Using LaTeX templates for resumes
-5. Want learning system with RAG
-
-## If You Need to Share Code State
-
-```python
-# Current working file: src/[path/to/file.py]
-[PASTE CURRENT CODE]
-
-If You Hit an Error
-Error occurred in: [file and function]
-Error message:
-[PASTE FULL ERROR]
-
-What I tried:
-1. [What you attempted]
-2. [Other solutions tried]
+## Key Context Points
+- Using Python-only (no Go)
+- Have existing K8s cluster for eventual deployment
+- Starting with LinkedIn Easy Apply
+- Changed all 'metadata' columns to 'extra_data' in models
+- Both asyncpg and psycopg2-binary installed
