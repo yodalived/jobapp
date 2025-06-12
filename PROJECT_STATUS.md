@@ -3,7 +3,7 @@
 ## Project Overview
 Building an automated resume generation and job application tracking system with learning capabilities.
 
-## Current Phase: Database Setup Complete (Day 1)
+## Current Phase: API Development (Day 1-2)
 - [x] Project structure created
 - [x] Python environment with Poetry
 - [x] Dependencies installed (FastAPI, SQLAlchemy, Celery, etc.)
@@ -13,73 +13,57 @@ Building an automated resume generation and job application tracking system with
 - [x] Database models created (JobApplication, Company, ResumeVersion, etc.)
 - [x] Alembic migrations configured and initial migration run
 - [x] Database tables successfully created
-- [ ] First API endpoints
-- [ ] Basic authentication
+- [x] FastAPI application with startup checks
+- [x] CRUD endpoints for job applications
+- [x] Health check with service status
+- [x] Auto-generated API documentation (/docs)
+- [ ] Authentication (JWT)
 - [ ] Resume template setup
+- [ ] LinkedIn scraper
+- [ ] Resume generator
 
-## Architecture Decisions
-- **Language**: Python-only implementation (decided against Go hybrid for faster development)
-- **API**: FastAPI with async/await
-- **Database**: PostgreSQL with asyncpg + psycopg2-binary (for migrations)
-- **Cache/Queue**: Redis with Celery
-- **Scraping**: Playwright (Selenium alternative)
-- **Resume Generation**: LaTeX templates with Jinja2
-- **LLM Integration**: LangChain + OpenAI
-- **Deployment Target**: Kubernetes cluster
+## Working API Endpoints
+- GET / - API info
+- GET /health - Health check with service status
+- GET /docs - Interactive API documentation
+- POST /api/v1/applications/ - Create job application
+- GET /api/v1/applications/ - List applications (with filtering)
+- GET /api/v1/applications/stats/summary - Application statistics
+- GET /api/v1/applications/{id} - Get specific application
+- PATCH /api/v1/applications/{id} - Update application
+- DELETE /api/v1/applications/{id} - Delete application
+- POST /api/v1/applications/{id}/notes - Add note to application
 
-## System Components
-1. **API Service** - FastAPI application for REST endpoints
-2. **Worker Service** - Celery workers for background tasks
-3. **Scraper Service** - Playwright-based job scraping
-4. **Generator Service** - Resume/cover letter generation
-5. **ML Service** - Learning from application outcomes
+## Key Technical Decisions
+- Python-only (no Go hybrid)
+- Async PostgreSQL with asyncpg
+- Renamed 'metadata' to 'extra_data' (SQLAlchemy reserved word)
+- Database connection check on startup with helpful errors
+- Route ordering: specific routes before parameterized ones
+- Health endpoint reports individual service status
 
-## Key Features Planned
-- Job application tracking with state machine
-- Automated resume customization based on job descriptions
-- LinkedIn Easy Apply automation (Phase 1)
-- Success pattern learning with RAG
-- Auto-discovery of relevant jobs
-- Analytics dashboard
+## How to Run
+# 1. Start services
+docker-compose up -d postgres redis
 
-## Infrastructure Context
-Existing K8s cluster with:
-- Redis
-- MySQL
-- PostgreSQL  
-- InfluxDB
-- n8n (workflow automation)
-- Prometheus & Grafana
+# 2. Run API
+poetry run uvicorn src.api.main:app --reload
 
-## Database Schema (COMPLETED)
-- job_applications table - Main tracking with status, scores, timestamps
-- application_status_history - Track status changes
-- application_notes - User notes on applications
-- companies table - Company information
-- resume_versions - Track different resume versions and performance
+# 3. View docs
+http://localhost:8000/docs
 
-## Next Immediate Steps
-1. Create FastAPI main.py with basic configuration
-2. Create CRUD operations for job applications
-3. Add authentication endpoints (JWT)
-4. Create first API router for applications
-5. Test endpoints with Postman/curl
+## Next Steps
+1. Add JWT authentication
+2. Create resume LaTeX templates
+3. Build resume generator service
+4. Start LinkedIn scraper
 
 ## Important Notes
-- Changed all 'metadata' columns to 'extra_data' (metadata is reserved in SQLAlchemy)
-- Using both asyncpg (for FastAPI) and psycopg2-binary (for Alembic)
-- Database URL format: postgresql://user:pass@host/db
-
-## Questions/Blockers
-- None currently - database setup successful!
+- FastAPI auto-generates /docs from code
+- Routes must be ordered: specific before generic
+- All CRUD operations tested and working
+- Database connection validated on startup
 
 ## Conversation History
-- Chat 1 (2024-12-19): Architecture planning, tech stack decisions, project structure, database models, successful migration
-
-## Commands Run So Far
-```bash
-# All previous commands plus:
-poetry add psycopg2-binary  # Added for Alembic sync operations
-poetry run alembic init alembic
-poetry run alembic revision --autogenerate -m "Initial models - job applications, companies, resumes"
-poetry run alembic upgrade head
+- Chat 1 (2024-12-19): Initial setup, database models, migrations
+- Chat 2 (2024-12-19): API endpoints, startup checks, route implementation

@@ -1,6 +1,6 @@
 # src/core/config.py
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, List
 from dotenv import load_dotenv
 import os
 
@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     # API
     api_v1_prefix: str = "/api/v1"
     project_name: str = "Resume Automation"
+
+    # API Settings (optional)
+    port: Optional[int] = 8000
+    allowed_origins: Optional[List[str]] = None
     
     # Security
     secret_key: str
