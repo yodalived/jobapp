@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}       % set main text size
+\usepackage[letterpaper,                % set paper size to letterpaper. change to a4paper for resumes outside of North America
+top=0.5in,                          % specify top page margin
+bottom=0.5in,                       % specify bottom page margin
+left=0.5in,                         % specify left page margin
+right=0.5in]{geometry}              % specify right page margin
+                       
+\usepackage{XCharter}               % set font. comment this line out if you want to use the default LaTeX font Computer Modern
+\usepackage[T1]{fontenc}            % output encoding
+\usepackage[utf8]{inputenc}         % input encoding
+\usepackage{enumitem}               % enable lists for bullet points: itemize and \item
+\usepackage[hidelinks]{hyperref}    % format hyperlinks
+\usepackage{titlesec}               % enable section title customization
+\raggedright                        % disable text justification
+\pagestyle{empty}                   % disable page numbering
+% ensure PDF output will be all-Unicode and machine-readable
+\input{glyphtounicode}
+\pdfgentounicode=1
+% format section headings: bolding, size, white space above and below
+\titleformat{\section}{\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule\vspace{-6.5pt}]
+% format bullet points: size, white space above and below, white space between bullets
+\renewcommand\labelitemi{$\vcenter{\hbox{\small$\bullet$}}$}
+\setlist[itemize]{itemsep=-2pt, leftmargin=12pt, topsep=7pt} %%% Test various topsep values to fix vertical spacing errors
+% resume starts here
+\begin{document}
+% name
+\centerline{\Huge {{ name }}}
+\vspace{5pt}
+% contact information
+{% set contact_items = [] %}
+{% if email %}{% set _ = contact_items.append('\\href{mailto:' + email + '}{' + email + '}') %}{% endif %}
+{% if phone %}{% set _ = contact_items.append(phone) %}{% endif %}
+{% if portfolio %}{% set _ = contact_items.append('\\href{' + portfolio + '}{' + (portfolio_display|default(portfolio)) + '}') %}{% endif %}
+{% if github %}{% set _ = contact_items.append('\\href{' + github + '}{' + (github_display|default(github)) + '}') %}{% endif %}
+{% if linkedin %}{% set _ = contact_items.append('\\href{' + linkedin + '}{' + (linkedin_display|default('LinkedIn')) + '}') %}{% endif %}
+{% if location %}{% set _ = contact_items.append(location) %}{% endif %}
+{% if contact_items %}
+\centerline{{ '{' }}{{ contact_items|join(' | ') }}{{ '}' }}
+{% endif %}
+\vspace{-10pt}
+% summary section
+{% if summary %}
+\section*{Summary}
+{{ summary }}
+\vspace{-6.5pt}
+{% endif %}
+% skills section
+{% if skills %}
+\section*{Skills}
+{% for group_name, items in skills.items() %}
+\textbf{{ '{' }}{{ group_name }}:{{ '}' }} {{ items|join(', ') }}{% if not loop.last %} \\{% endif %}
+{% endfor %}
+\vspace{-6.5pt}
+{% endif %}
+% experience section
+{% if experience %}
+\section*{Experience}
+{% for job in experience %}
+\textbf{{ '{' }}{{ job.title }},{{ '}' }} {{ '{' }}{{ job.company }}{{ '}' }} -- {{ job.location }} \hfill {{ job.start_date }} -- {{ job.end_date|default('Present') }} \\
+\vspace{-9pt}
+\begin{itemize}
+{% for bullet in job.bullets %}
+  \item {{ bullet }}
+{% endfor %}
+\end{itemize}
+{% if not loop.last %}\vspace{-6.5pt}{% endif %}
+{% endfor %}
+\vspace{-18.5pt}
+{% endif %}
+% education section
+{% if education %}
+\section*{Education}
+{% for edu in education %}
+\textbf{{ '{' }}{{ edu.school }}{{ '}' }} -- {{ edu.degree }}{% if edu.graduation_date %} \hfill {{ edu.graduation_date }}{% endif %}
+{% endfor %}
+{% endif %}
+\end{document}

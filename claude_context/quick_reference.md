@@ -1,62 +1,57 @@
-# claude_context/quick_reference.md
+# Quick Reference Guide
 
-## Database Connection Test
-```python
-# Test database connection
-from src.core.database import engine, AsyncSessionLocal
-from src.api.models.schema import JobApplication
+## Common Commands
+# Start development
+source venv/bin/activate
+docker-compose up -d postgres redis
+poetry run uvicorn src.api.main:app --reload
 
-# Async test
-async def test_db():
-    async with AsyncSessionLocal() as session:
-        result = await session.execute("SELECT 1")
-        print(result.scalar())
+# Run migrations
+poetry run alembic upgrade head
 
-Common Imports
-# FastAPI
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+# Create new migration
+poetry run alembic revision --autogenerate -m "Description"
 
-# Database
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete
+# Test endpoints
+export TOKEN="your-jwt-token"
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/api/v1/applications/
+
+## Project Structure
+src/
+├── api/
+│   ├── models/          # SQLAlchemy models
+│   ├── routers/         # API endpoints
+│   └── dependencies.py  # Auth dependencies
+├── core/               # Config, database
+├── generator/          # Resume generation
+│   ├── templates/      # LaTeX templates
+│   ├── llm_interface.py
+│   └── resume_customizer_rag.py
+└── worker/            # Celery tasks (future)
+
+## Key Imports
+from src.api.dependencies import get_current_active_user
 from src.core.database import get_db
+from src.generator.resume_generator import ResumeGenerator
+from src.generator.resume_customizer_rag import ResumeCustomizerWithRAG
 
-# Models
-from src.api.models.schema import JobApplication, Company, ResumeVersion
-from src.api.models.schemas import JobApplicationCreate, JobApplicationResponse
-Environment Variables Required
-DATABASE_URL
-ASYNC_DATABASE_URL
-REDIS_URL
-SECRET_KEY
+## Environment Variables
+DATABASE_URL=postgresql://...
+ASYNC_DATABASE_URL=postgresql+asyncpg://...
+REDIS_URL=redis://localhost:6379
+SECRET_KEY=your-secret-key
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
 
-# Docker Commands
-docker start resume-postgres resume-redis
-docker stop resume-postgres resume-redis
-docker ps  # Check running
+## Testing Flow
+1. Register user
+2. Login to get token
+3. Create job application
+4. Generate customized resume
+5. Check PDF output
 
-# Current Enum Values
-ApplicationStatus: discovered, queued, applied, acknowledged, screening, interview, offer, rejected, withdrawn
-JobType: technical, management, hybrid
-
-## Commit These Updates
-
-```bash
-# Stage all documentation updates
-git add PROJECT_STATUS.md
-git add claude_context/current_code_structure.md
-git add claude_context/next_session_template.md
-git add claude_context/quick_reference.md
-
-# Commit with clear message
-git commit -m "docs: Update documentation after successful database setup
-
-- Database models created and migrated
-- Alembic configured and working
-- Updated all context files for next session
-- Added quick reference guide
-- Note: metadata columns renamed to extra_data"
-
-# Check your work
-git log --oneline -5
+## Common Issues
+- LaTeX not installed: sudo apt-get install texlive-latex-base texlive-fonts-extra
+- Import errors: Check PYTHONPATH or use poetry run
+- Auth errors: Token expired or missing Bearer prefix
+- PDF generation fails: Check LaTeX syntax and escaping

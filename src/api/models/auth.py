@@ -42,8 +42,7 @@ class User(Base):
     
     # Relationships
     job_applications = relationship("JobApplication", back_populates="user", cascade="all, delete-orphan")
-    resume_versions = relationship("ResumeVersion", back_populates="user", cascade="all, delete-orphan")
-    
+    resume_versions = relationship("ResumeVersion", back_populates="user", cascade="all, delete-orphan") 
 
 # Usage limits per tier
 TIER_LIMITS = {

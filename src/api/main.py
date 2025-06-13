@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.core.config import settings
 from src.core.database import engine
-from src.api.routers import applications
+from src.api.routers import applications, auth
 
 
 async def check_database_connection(engine: AsyncEngine) -> bool:
@@ -89,11 +89,16 @@ app.add_middleware(
 
 # Include routers
 app.include_router(
+    auth.router,
+    prefix=f"{settings.api_v1_prefix}/auth",
+    tags=["authentication"]
+)
+
+app.include_router(
     applications.router, 
     prefix=f"{settings.api_v1_prefix}/applications",
     tags=["applications"]
 )
-
 
 @app.get("/", tags=["root"])
 async def root():

@@ -3,90 +3,107 @@
 ## Project Overview
 Building an automated resume generation and job application tracking system with multi-tenant SaaS architecture.
 
-## Current Phase: Authentication & Multi-Tenancy (Day 2)
+## Current Phase: Advanced Resume Generation with RAG (Day 2-3)
 - [x] Project structure created
 - [x] Database models with migrations
 - [x] FastAPI application with startup checks
 - [x] CRUD endpoints for job applications
 - [x] Health check with service status
 - [x] Auto-generated API documentation
-- [x] Multi-tenant architecture designed
+- [x] Multi-tenant architecture with JWT authentication
 - [x] User model with SaaS features (subscription tiers, usage limits)
-- [x] JWT authentication implemented
-- [x] All endpoints now user-scoped
+- [x] Resume generator with LaTeX templates
+- [x] LLM integration (OpenAI and Claude support)
+- [x] Industry-specific system prompts
+- [x] RAG document support for resume guidelines
+- [x] Multi-LLM provider support
 - [ ] Email verification
-- [ ] Resume template setup
 - [ ] LinkedIn scraper
-- [ ] Resume generator
+- [ ] Frontend UI
 
 ## Working API Endpoints
 ### Public Endpoints
 - GET / - API info
-- GET /health - Health check with service status
+- GET /health - Health check
 - GET /docs - Interactive API documentation
 - POST /api/v1/auth/register - Register new user
-- POST /api/v1/auth/login - Login (returns JWT token)
+- POST /api/v1/auth/login - Login (returns JWT)
 
 ### Protected Endpoints (Require Authentication)
-- GET /api/v1/auth/me - Get current user info
-- GET /api/v1/auth/me/usage - Get usage stats and limits
+#### Auth
+- GET /api/v1/auth/me - Current user info
+- GET /api/v1/auth/me/usage - Usage stats and limits
+
+#### Applications
 - POST /api/v1/applications/ - Create job application
-- GET /api/v1/applications/ - List user's applications
-- GET /api/v1/applications/stats/summary - User's application statistics
+- GET /api/v1/applications/ - List applications
+- GET /api/v1/applications/stats/summary - Application statistics
 - GET /api/v1/applications/{id} - Get specific application
 - PATCH /api/v1/applications/{id} - Update application
 - DELETE /api/v1/applications/{id} - Delete application
-- POST /api/v1/applications/{id}/notes - Add note to application
+- POST /api/v1/applications/{id}/notes - Add note
 
-## Multi-Tenant Architecture
-- User model with subscription tiers (FREE, STARTER, PROFESSIONAL, ENTERPRISE)
-- Usage tracking (applications_count, resumes_generated_count)
-- Row-level security - users only see their own data
-- Subscription limits enforced per tier
-- All models have user_id foreign key
+#### Generator
+- POST /api/v1/generator/generate-with-rag - Generate resume with RAG
+- POST /api/v1/generator/analyze-job - Analyze job description
+- GET /api/v1/generator/llm-providers - List available LLM providers
 
-## How to Run
-# 1. Start services
-docker-compose up -d postgres redis
+#### Customization
+- GET /api/v1/customization/prompts - List system prompts
+- POST /api/v1/customization/prompts - Create custom prompt
+- GET /api/v1/customization/rag-documents - List RAG documents
+- POST /api/v1/customization/rag-documents - Create RAG document
+- GET /api/v1/customization/industries - List industry templates
 
-# 2. Run migrations (if not done)
-poetry run alembic upgrade head
+## Key Features Implemented
+1. Multi-tenant job tracking with user isolation
+2. LaTeX-based resume generation
+3. AI customization using OpenAI or Claude
+4. Industry-specific prompts and guidelines
+5. RAG system for resume best practices
+6. Subscription tiers with usage limits
 
-# 3. Run API
-poetry run uvicorn src.api.main:app --reload
+## Database Schema
+### Core Tables
+- users (with subscription tiers)
+- job_applications (user-scoped)
+- resume_versions
+- application_notes
+- companies
 
-# 4. Register a user
-curl -X POST http://localhost:8000/api/v1/auth/register -H "Content-Type: application/json" -d '{"email": "test@example.com", "password": "password123"}'
+### New Customization Tables
+- system_prompts (industry-specific AI prompts)
+- rag_documents (resume guidelines and examples)
+- industry_templates (industry configurations)
 
-# 5. Login to get token
-curl -X POST http://localhost:8000/api/v1/auth/login -H "Content-Type: application/x-www-form-urlencoded" -d "username=test@example.com&password=password123"
-
-# 6. Use token for protected endpoints
-curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/v1/applications/
+## Tech Stack
+- FastAPI + SQLAlchemy + Alembic
+- PostgreSQL + Redis
+- JWT Authentication
+- LaTeX (texlive) for PDF generation
+- OpenAI/Claude for AI customization
+- Docker for services
 
 ## Next Steps
-1. Add email verification
-2. Create resume LaTeX templates
-3. Build resume generator service
-4. Start LinkedIn scraper
-5. Add subscription management
+1. Create seed data for prompts and RAG documents
+2. Implement vector embeddings for RAG search
+3. Add LinkedIn Easy Apply scraper
+4. Build frontend UI
+5. Add email notifications
 
-## New Files Created
-- src/api/models/auth.py - User model with SaaS features
-- src/api/models/auth_schemas.py - Pydantic schemas for auth
-- src/core/auth.py - Authentication utilities
-- src/api/dependencies.py - FastAPI dependencies (get_current_user)
-- src/api/routers/auth.py - Authentication endpoints
-- Updated all existing models to include user_id
-- Updated applications.py to require authentication
+## Files Created/Modified Today
+- src/api/models/resume_customization.py - New models for prompts/RAG
+- src/generator/resume_customizer_rag.py - RAG-enhanced customizer
+- src/generator/llm_interface.py - Multi-LLM provider support
+- src/api/routers/customization.py - Endpoints for managing prompts
+- src/api/routers/generator_rag.py - Enhanced generation endpoint
+- src/generator/default_customizations.py - Default prompts/docs
 
-## Important Notes
-- All endpoints now require authentication except public ones
-- Users can only see/modify their own data
-- Subscription tiers have different limits
-- JWT tokens expire based on settings
-- Password hashing with bcrypt
-
-## Conversation History
-- Chat 1: Initial setup, database models, migrations
-- Chat 2: API endpoints, startup checks, authentication & multi-tenancy
+## Environment Variables Needed
+DATABASE_URL=postgresql://postgres:postgres@localhost/resume_db
+ASYNC_DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost/resume_db
+REDIS_URL=redis://localhost:6379
+SECRET_KEY=your-secret-key
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+DEFAULT_LLM_PROVIDER=openai

@@ -86,7 +86,7 @@ class ApplicationNote(Base):
 
     # User Information
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    user = relationship("User", back_populates="companies")
+    user = relationship("User")
     
     id = Column(Integer, primary_key=True, index=True)
     application_id = Column(Integer, ForeignKey("job_applications.id"))
@@ -94,14 +94,14 @@ class ApplicationNote(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationship
-    application = relationship("JobApplication", back_populates="notes")
+    application = relationship("JobApplication")
 
 class Company(Base):
     __tablename__ = "companies"
 
     # User Information
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    user = relationship("User", back_populates="companies")
+    user = relationship("User")
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False, index=True)

@@ -1,38 +1,51 @@
-# Next Session Template
+# Resume Automation Project - Session Start Template
 
-I'm continuing work on my resume automation system. Current status:
+## Project Overview
+Multi-tenant SaaS for automated resume generation and job tracking with AI customization.
 
-## Completed
-- Multi-tenant architecture with user authentication
-- JWT-based auth with subscription tiers
-- All endpoints protected and user-scoped
-- Database models with user relationships
-- Full CRUD API for job applications
+## Current Status
+- ✅ Complete authentication system with JWT
+- ✅ Job application tracking API
+- ✅ Resume generation with LaTeX
+- ✅ Multi-LLM support (OpenAI + Claude)
+- ✅ Industry-specific prompts and RAG
+- ⏳ Need: LinkedIn scraper, Frontend, Email verification
 
-## Project Structure
-- FastAPI with PostgreSQL/Redis
-- Authentication with JWT tokens
-- Multi-tenant (each user sees only their data)
-- Subscription tiers: FREE, STARTER, PROFESSIONAL, ENTERPRISE
+## Tech Stack
+- Backend: FastAPI, SQLAlchemy, PostgreSQL, Redis
+- Auth: JWT with subscription tiers
+- AI: OpenAI/Claude with RAG
+- Resume: LaTeX → PDF
+- Queue: Celery (configured but not implemented)
 
-## Current Task
-[SPECIFY: email verification, resume generator, linkedin scraper, etc.]
-
-## Key Files
-- src/api/routers/applications.py - Protected CRUD endpoints
-- src/api/routers/auth.py - Auth endpoints
-- src/api/models/auth.py - User model with SaaS features
-- src/api/dependencies.py - get_current_user dependency
-
-## To Start Development
+## Quick Start
 source venv/bin/activate
 docker-compose up -d postgres redis
 poetry run uvicorn src.api.main:app --reload
 
-## Auth Testing
-# Get token
-curl -X POST http://localhost:8000/api/v1/auth/login -d "username=test@example.com&password=password123"
-# Use token
-curl -H "Authorization: Bearer TOKEN" http://localhost:8000/api/v1/applications/
+## Recent Additions
+1. Industry-specific system prompts
+2. RAG document storage
+3. Multi-LLM provider support
+4. Enhanced resume customization
 
-[PASTE SPECIFIC QUESTION/ERROR]
+## Database Tables
+Core: users, job_applications, resume_versions, companies
+New: system_prompts, rag_documents, industry_templates
+
+## Key Endpoints
+- POST /api/v1/generator/generate-with-rag - AI resume generation
+- GET /api/v1/customization/prompts - List prompts
+- POST /api/v1/customization/rag-documents - Add guidelines
+
+## Environment Setup
+Required in .env:
+- DATABASE_URL, ASYNC_DATABASE_URL
+- REDIS_URL, SECRET_KEY
+- OPENAI_API_KEY and/or ANTHROPIC_API_KEY
+
+## Next Priority
+[SPECIFY: LinkedIn scraper, Frontend, Embeddings, etc.]
+
+## Current Task
+[PASTE SPECIFIC QUESTION/TASK]
