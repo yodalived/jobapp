@@ -1,52 +1,38 @@
-# Template for Starting Next Claude Session
+# Next Session Template
 
-## Opening Message Template
+I'm continuing work on my resume automation system. Current status:
 
-I'm continuing work on my resume automation system in Python. Here's the current status:
+## Completed
+- Multi-tenant architecture with user authentication
+- JWT-based auth with subscription tiers
+- All endpoints protected and user-scoped
+- Database models with user relationships
+- Full CRUD API for job applications
 
-**Project**: Automated resume generation and job application tracking system
+## Project Structure
+- FastAPI with PostgreSQL/Redis
+- Authentication with JWT tokens
+- Multi-tenant (each user sees only their data)
+- Subscription tiers: FREE, STARTER, PROFESSIONAL, ENTERPRISE
 
-**Completed So Far**:
-- Project structure with Poetry
-- PostgreSQL & Redis running in Docker
-- Database models (JobApplication, Company, ResumeVersion, etc.)
-- Alembic migrations configured and run
-- Tables successfully created in database
+## Current Task
+[SPECIFY: email verification, resume generator, linkedin scraper, etc.]
 
-**Current Database Schema**:
-- job_applications (main tracking)
-- application_status_history
-- application_notes
-- companies
-- resume_versions
+## Key Files
+- src/api/routers/applications.py - Protected CRUD endpoints
+- src/api/routers/auth.py - Auth endpoints
+- src/api/models/auth.py - User model with SaaS features
+- src/api/dependencies.py - get_current_user dependency
 
-**Next Task**: Create FastAPI endpoints for CRUD operations on job applications
+## To Start Development
+source venv/bin/activate
+docker-compose up -d postgres redis
+poetry run uvicorn src.api.main:app --reload
 
-**Tech Stack**:
-- FastAPI (async API)
-- PostgreSQL + SQLAlchemy + Alembic
-- Redis + Celery
-- Playwright (scraping)
-- LangChain + OpenAI
+## Auth Testing
+# Get token
+curl -X POST http://localhost:8000/api/v1/auth/login -d "username=test@example.com&password=password123"
+# Use token
+curl -H "Authorization: Bearer TOKEN" http://localhost:8000/api/v1/applications/
 
-**Current Working Directory Structure**:
-src/
-├── api/
-│   ├── models/
-│   │   ├── schema.py   # SQLAlchemy models
-│   │   └── schemas.py  # Pydantic models
-│   └── main.py        # Need to create this
-├── core/
-│   ├── config.py      # Settings
-│   └── database.py    # DB connection
-
-**Specific Question**: [FILL IN]
-
-[PASTE ANY RELEVANT CODE OR ERRORS]
-
-## Key Context Points
-- Using Python-only (no Go)
-- Have existing K8s cluster for eventual deployment
-- Starting with LinkedIn Easy Apply
-- Changed all 'metadata' columns to 'extra_data' in models
-- Both asyncpg and psycopg2-binary installed
+[PASTE SPECIFIC QUESTION/ERROR]

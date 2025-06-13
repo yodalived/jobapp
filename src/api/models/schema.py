@@ -26,6 +26,10 @@ class JobApplication(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     
+    # User Information
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user = relationship("User", back_populates="job_applications")
+
     # Job Information
     company = Column(String, nullable=False, index=True)
     position = Column(String, nullable=False)
@@ -79,6 +83,10 @@ class ApplicationStatusHistory(Base):
 
 class ApplicationNote(Base):
     __tablename__ = "application_notes"
+
+    # User Information
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user = relationship("User", back_populates="companies")
     
     id = Column(Integer, primary_key=True, index=True)
     application_id = Column(Integer, ForeignKey("job_applications.id"))
@@ -90,6 +98,10 @@ class ApplicationNote(Base):
 
 class Company(Base):
     __tablename__ = "companies"
+
+    # User Information
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user = relationship("User", back_populates="companies")
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False, index=True)
@@ -103,6 +115,10 @@ class Company(Base):
 
 class ResumeVersion(Base):
     __tablename__ = "resume_versions"
+
+    # User Information
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    user = relationship("User", back_populates="resume_versions")
     
     id = Column(Integer, primary_key=True, index=True)
     version_name = Column(String, nullable=False)
