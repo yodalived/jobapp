@@ -31,9 +31,11 @@ class Settings(BaseSettings):
     linkedin_email: Optional[str] = None
     linkedin_password: Optional[str] = None
     
-    # OpenAI
+    # LLM Settings (ADD THESE)
     openai_api_key: Optional[str] = None
-    
+    anthropic_api_key: Optional[str] = None
+    default_llm_provider: Optional[str] = "openai"  # or "anthropic"
+
     # Scraping
     scrape_interval_hours: int = 6
     max_applications_per_day: int = 50

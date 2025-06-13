@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from src.core.database import get_db
 from src.core.config import settings
 from src.core.auth import get_password_hash, authenticate_user, create_access_token
-from src.api.models.auth import User
+from src.api.models.auth import User, TIER_LIMITS
 from src.api.models.auth_schemas import UserCreate, User as UserResponse, Token
 from src.api.dependencies import get_current_active_user
 
