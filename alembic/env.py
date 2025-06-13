@@ -20,6 +20,9 @@ from src.api.models.schema import (
     ApplicationNote, Company, ResumeVersion
 )
 
+# This ensures src.api.models.auth.User is registered with Base.metadata
+from src.api.models import auth 
+
 config = context.config
 
 # Set the database URL from our settings
