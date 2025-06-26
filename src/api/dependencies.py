@@ -2,7 +2,6 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import Optional
 
 from src.core.database import get_db
 from src.core.auth import decode_access_token
@@ -51,6 +50,31 @@ async def get_current_user(
 async def get_current_active_user(
     current_user: User = Depends(get_current_user)
 ) -> User:
+    return current_user
+
+
+async def get_verified_user(
+    current_user: User = Depends(get_current_active_user)
+) -> User:
+    """Ensure the user has verified their email"""
+    if not current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email verification required. Please check your email to verify your account."
+        )
+    return current_user
+
+
+async def check_resume_generation_limit(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+) -> User:
+    """Check if unverified users have reached their resume generation limit"""
+    if not current_user.email_verified and current_user.resumes_generated_count >= 2:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Resume generation limit reached (2 resumes for unverified accounts). Please verify your email to continue."
+        )
     return current_user
 
 

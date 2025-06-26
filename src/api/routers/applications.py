@@ -15,7 +15,7 @@ from src.api.models.schemas import (
    ApplicationNoteResponse,
    ApplicationStatusEnum
 )
-from src.api.dependencies import get_current_active_user
+from src.api.dependencies import get_current_active_user, get_verified_user
 from src.api.models.auth import User
 
 router = APIRouter(tags=["applications"])
@@ -65,7 +65,7 @@ async def get_application_stats(
 @router.post("/", response_model=JobApplicationResponse)
 async def create_application(
    application: JobApplicationCreate,
-   current_user: User = Depends(get_current_active_user),
+   current_user: User = Depends(get_verified_user),
    db: AsyncSession = Depends(get_db)
 ):
    """Create a new job application"""

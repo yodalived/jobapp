@@ -1,0 +1,102 @@
+# Model Configuration for docs-cli
+# Copy this file to model-config.yaml and add your API keys
+
+# Default model provider and settings (fallback when no specific config exists)
+default:
+  provider: "anthropic"
+  model: "claude-sonnet-4-20250514"
+  max_tokens: 4000
+  temperature: 0.7
+
+# OpenAI Configuration
+openai:
+  api_key: "your-openai-api-key-here"  # Replace with actual key
+  models:
+    gpt-4o: "gpt-4o"
+    gpt-4o-mini: "gpt-4o-mini"
+    gpt-4.1: "gpt-4.1-preview"
+    o3-mini: "o3-mini"
+    gpt-4-turbo: "gpt-4-turbo-preview"
+    gpt-3.5-turbo: "gpt-3.5-turbo"
+  max_tokens: 4000
+  temperature: 0.7
+  thinking_models:
+    - "o1-preview"
+    - "o1-mini"
+    - "o3-mini"
+    - "o3-preview"
+
+# Anthropic Configuration  
+anthropic:
+  api_key: "your-anthropic-api-key-here"  # Replace with actual key
+  models:
+    opus-4: "claude-opus-4-20250514"
+    sonnett-4: "claude-sonnet-4-20250514"
+    sonnet-3.5: "claude-3-5-sonnet-20241022"
+    haiku-3.5: "claude-3-5-haiku-20241022"
+  max_tokens: 4000
+  temperature: 0.7
+  thinking_models:
+    - "claude-3-opus-20240229"
+    - "claude-3-sonnet-20240229"
+    - "claude-sonnet-4-20250514"
+    - "claude-opus-4-20250514"
+
+# OpenRouter Configuration
+openrouter:
+  api_key: "your-openrouter-api-key-here"  # Replace with actual key
+  models:
+    gpt-4o: "openai/gpt-4o"
+    gpt-3.5-turbo: "openai/gpt-3.5-turbo"
+    claude-sonnet: "anthropic/claude-3-5-sonnet-20241022"
+    claude-haiku: "anthropic/claude-3-5-haiku-20241022"
+    llama-3.1: "meta-llama/llama-3.1-70b-instruct"
+    deepseek-r1: "deepseek/deepseek-r1"
+    deepseek-r1-distill: "deepseek/deepseek-r1-distill-qwen-32b"
+  max_tokens: 4000
+  temperature: 0.7
+  thinking_models:
+    - "deepseek/deepseek-r1"
+    - "openai/o1-preview"
+    - "openai/o1-mini"
+    - "openai/o3-mini"
+    - "anthropic/claude-3-opus-20240229"
+    - "anthropic/claude-3-sonnet-20240229"
+
+# Per-document type configuration with cost optimization and thinking capabilities
+document_types:
+  ARCHITECTURE:
+    provider: "openai"
+    model: "gpt-4.1"
+    max_tokens: 6000
+    temperature: 4.5
+    context_strategy: "minimal"
+    enable_thinking: false
+    thinking_level: "medium"
+    
+  README:
+    provider: "openrouter"
+    model: "deepseek-r1"
+    max_tokens: 4000
+    temperature: 0.7
+    context_strategy: "compressed"
+    enable_thinking: true
+    thinking_level: "high"
+    
+  SETUP:
+    provider: "openrouter"
+    model: "deepseek-r1" 
+    max_tokens: 3000
+    temperature: 0.7
+    context_strategy: "summary_only"
+    enable_thinking: true
+    thinking_level: "medium"
+    
+  CHECKLIST:
+    provider: "openai"
+    model: "gpt-4o-mini"
+    max_tokens: 2000
+    temperature: 0.0
+    context_strategy: "ultra_compressed"
+    enable_thinking: false
+    thinking_level: "low"

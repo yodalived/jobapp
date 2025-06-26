@@ -1,0 +1,164 @@
+# Enterprise Configuration for docs-cli - Example
+# Copy this file to enterprise-config.yaml for your deployment
+
+application:
+  cache:
+    ttl: 2m                    # Cache time-to-live
+    max_size_mb: 50           # Maximum cache size in MB
+    max_entries: 1000         # Maximum number of cache entries
+    cleanup_interval: 1m      # How often to cleanup expired entries
+    metrics_log_interval: 10m # How often to log cache metrics
+  
+  monitoring:
+    memory_warning_mb: 500    # Memory usage warning threshold
+    memory_critical_mb: 1000  # Memory usage critical threshold
+    check_interval: 30s       # How often to check memory usage
+    gc_interval: 2m           # Garbage collection interval
+  
+  resilience:
+    retry:
+      max_attempts: 3         # Maximum retry attempts
+      initial_delay: 1s       # Initial retry delay
+      max_delay: 30s          # Maximum retry delay
+      backoff_multiplier: 2.0 # Exponential backoff multiplier
+    circuit_breaker:
+      max_requests: 3         # Max requests in half-open state
+      interval: 60s           # Time window for failure counting
+      timeout: 30s            # Timeout in open state
+      failure_threshold: 5    # Failures to trigger open state
+
+  file_scanning:
+    max_depth: 3              # Default directory scan depth
+    binary_detection_buffer: 512  # Buffer size for binary file detection
+    default_file_limit: 10    # Default number of files to include
+    
+    # File type priority scoring (higher = more important)
+    file_priorities:
+      ".go": 10
+      ".py": 9
+      ".ts": 8
+      ".tsx": 7
+      ".js": 6
+      ".jsx": 5
+      ".tex": 4
+      ".yaml": 3
+      ".yml": 2
+      ".json": 1
+      ".md": 0
+
+providers:
+  anthropic:
+    api_url: "https://api.anthropic.com/v1/messages"
+    timeout: 30s
+    api_version: "2023-06-01"
+    temperature_range:
+      min: 0.0
+      max: 1.0
+    stop_sequences:
+      - "\n\nHuman:"
+  
+  openai:
+    api_url: "https://api.openai.com/v1/chat/completions"
+    timeout: 60s
+    temperature_range:
+      min: 0.0
+      max: 2.0
+    
+  openrouter:
+    api_url: "https://openrouter.ai/api/v1/chat/completions"
+    timeout: 90s
+    temperature_range:
+      min: 0.0
+      max: 2.0
+    metadata:
+      user_id: "docs-cli"
+      description: "Documentation generation for enterprise application"
+    headers:
+      http_referer: "https://docs-cli"
+      x_title: "Docs CLI Tool"
+
+cost_optimization:
+  token_estimation_ratio: 0.25  # Rough approximation: 1 token ≈ 4 characters
+  
+  compression:
+    max_ratio: 0.3              # Don't compress below 30% of original
+  
+  complexity_thresholds:
+    simple: 2000                # tokens - threshold for simple tasks
+    complex: 10000              # tokens - threshold for complex tasks
+  
+  # Pricing per 1K tokens (update as needed)
+  pricing:
+    anthropic:
+      sonnet4:
+        input_cost: 0.015       # $15 per 1M input tokens
+        output_cost: 0.075      # $75 per 1M output tokens
+      haiku:
+        input_cost: 0.0008      # $0.80 per 1M input tokens
+        output_cost: 0.004      # $4 per 1M output tokens
+    
+    openai:
+      gpt4:
+        input_cost: 0.005       # $5 per 1M input tokens
+        output_cost: 0.015      # $15 per 1M output tokens
+
+# Template system configuration
+templates:
+  fallback_enabled: true        # Whether to use hardcoded fallbacks if templates missing
+  directory: "templates"        # Directory containing prompt templates
+  
+  # Hardcoded prompt templates (fallback only - prefer external templates)
+  fallback_prompts:
+    README: |
+      Generate a comprehensive README.md that includes:
+      1. Component Overview (what it does, why it exists)
+      2. Key Features
+      3. Architecture/Design Patterns
+      4. Dependencies
+      5. Usage Examples
+      6. API Reference (if applicable)
+      7. Configuration
+      8. Development Notes
+      9. Testing
+      
+      Make it professional, clear, and actionable. Use proper markdown formatting.
+    
+    SETUP: |
+      Generate a SETUP.md that includes:
+      1. Prerequisites
+      2. Installation Steps
+      3. Configuration Requirements
+      4. Environment Variables
+      5. Database/Service Setup (if applicable)
+      6. Verification Steps
+      7. Troubleshooting Common Issues
+      8. Development Environment Setup
+      
+      Focus on step-by-step instructions that a new developer could follow.
+    
+    ARCHITECTURE: |
+      Generate an ARCHITECTURE.md that includes:
+      1. High-Level Architecture
+      2. Component Relationships
+      3. Data Flow
+      4. Key Design Decisions
+      5. Patterns Used (event-driven, etc.)
+      6. Scaling Considerations
+      7. Security Considerations
+      8. Technology Stack
+      9. Future Architecture Plans
+      
+      Focus on architectural decisions and system design.
+    
+    CHECKLIST: |
+      Generate a CHECKLIST.yaml that includes:
+      1. Feature categories with completion status
+      2. Individual tasks/features with:
+         - name
+         - status (completed/in_progress/planned)
+         - priority (high/medium/low)
+         - description
+         - dependencies (if any)
+      
+      Make it structured for status page generation. Focus on user-facing features and development milestones.
+      Format as valid YAML with proper structure.

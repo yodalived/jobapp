@@ -4,7 +4,6 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-import os
 import sys
 from pathlib import Path
 
@@ -15,13 +14,8 @@ from src.core.config import settings
 from src.core.database import Base
 
 # Import all models so Alembic can see them
-from src.api.models.schema import (
-    JobApplication, ApplicationStatusHistory, 
-    ApplicationNote, Company, ResumeVersion
-)
 
 # This ensures src.api.models.auth.User is registered with Base.metadata
-from src.api.models import auth 
 
 config = context.config
 

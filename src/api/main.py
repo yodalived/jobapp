@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from src.core.config import settings
 from src.core.database import engine
-from src.api.routers import applications, auth, generator
+from src.core.kafka_client import cleanup_event_producer
+from src.api.routers import applications, auth, generator, files
 
 
 async def check_database_connection(engine: AsyncEngine) -> bool:
@@ -46,6 +47,18 @@ async def check_redis_connection() -> bool:
         return True
 
 
+async def check_kafka_connection() -> bool:
+    """Test Kafka connection on startup (optional)"""
+    try:
+        from src.core.kafka_client import get_event_producer
+        producer = await get_event_producer()
+        print("✅ Kafka connection successful")
+        return True
+    except Exception as e:
+        print(f"⚠️  Kafka connection failed (non-critical): {str(e)}")
+        return True
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Handle startup and shutdown events"""
@@ -61,14 +74,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     if settings.redis_url:
         await check_redis_connection()
     
-    print(f"\n✅ API ready at http://localhost:{settings.port or 8000}")
-    print(f"📚 Documentation at http://localhost:{settings.port or 8000}/docs\n")
+    # Check Kafka connection
+    await check_kafka_connection()
+    
+    print(f"\n✅ API ready at http://localhost:{settings.port or 8048}")
+    print(f"📚 Documentation at http://localhost:{settings.port or 8048}/docs")
+    print(f"🎛️ Kafka UI at http://localhost:9080\n")
     
     yield
     
     # Shutdown
     print("\n👋 Gracefully shutting down...")
-    # Add any cleanup code here (close connections, save state, etc.)
+    await cleanup_event_producer()
 
 
 # Create FastAPI app
@@ -106,6 +123,12 @@ app.include_router(
     tags=["generator"]
 )
 
+app.include_router(
+    files.router,
+    prefix=f"{settings.api_v1_prefix}/files",
+    tags=["files"]
+)
+
 @app.get("/", tags=["root"])
 async def root():
     """Root endpoint"""
@@ -141,5 +164,13 @@ async def health_check():
             health_status["services"]["redis"] = "healthy"
         except Exception as e:
             health_status["services"]["redis"] = f"unhealthy: {str(e)}"
+    
+    # Check Kafka connection
+    try:
+        from src.core.kafka_client import get_event_producer
+        producer = await get_event_producer()
+        health_status["services"]["kafka"] = "healthy"
+    except Exception as e:
+        health_status["services"]["kafka"] = f"unhealthy: {str(e)}"
     
     return health_status

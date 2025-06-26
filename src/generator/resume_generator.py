@@ -1,13 +1,12 @@
-import os
 import subprocess
 import tempfile
+import shutil
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import hashlib
 from datetime import datetime
 
-from src.core.config import settings
 from src.api.models.schema import ResumeVersion, JobApplication
 from src.api.models.auth import User
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,9 +23,43 @@ class ResumeGenerator:
             lstrip_blocks=True
         )
         
+        # Add LaTeX escaping filter
+        self.env.filters['latex_escape'] = self._latex_escape
+        
         # Create output directory
         self.output_dir = Path("resume_outputs")
         self.output_dir.mkdir(exist_ok=True)
+    
+    def _latex_escape(self, text):
+        """Escape special LaTeX characters"""
+        if not isinstance(text, str):
+            return text
+        
+        # LaTeX special characters that need escaping
+        # Order matters: backslash must be first to avoid double-escaping
+        replacements = [
+            ('\\', r'\textbackslash '),  # Must be first, use space instead of {}
+            ('&', r'\&'),
+            ('%', r'\%'),
+            ('$', r'\$'),
+            ('#', r'\#'),
+            ('^', r'\textasciicircum '),
+            ('_', r'\_'),
+            ('~', r'\textasciitilde '),
+            ('{', r'\{'),
+            ('}', r'\}'),
+            ('<', r'\textless '),
+            ('>', r'\textgreater '),
+            ('|', r'\textbar '),
+            ('"', r"''"),  # Convert quotes to LaTeX style
+            ('[', r'{[}'),  # Protect square brackets
+            (']', r'{]}'),
+        ]
+        
+        for char, escaped in replacements:
+            text = text.replace(char, escaped)
+        
+        return text
     
     def generate_latex(self, template_name: str, data: Dict[str, Any]) -> str:
         """Generate LaTeX content from template and data"""
@@ -43,20 +76,29 @@ class ResumeGenerator:
             tex_file.write_text(latex_content, encoding='utf-8')
             
             # Compile LaTeX to PDF (run twice for proper rendering)
-            for _ in range(2):
+            for i in range(2):
                 result = subprocess.run(
                     ["pdflatex", "-interaction=nonstopmode", "-output-directory", temp_dir, str(tex_file)],
                     capture_output=True,
                     text=True
                 )
                 
-                if result.returncode != 0:
-                    raise Exception(f"LaTeX compilation failed: {result.stderr}")
+                # Check if PDF was created successfully (more important than return code)
+                pdf_path = temp_path / "resume.pdf"
+                if not pdf_path.exists():
+                    error_msg = f"LaTeX compilation failed - no PDF generated (run {i+1}/2):\n"
+                    error_msg += f"Return code: {result.returncode}\n"
+                    error_msg += f"STDOUT: {result.stdout}\n"
+                    error_msg += f"STDERR: {result.stderr}\n"
+                    error_msg += f"Command: pdflatex -interaction=nonstopmode -output-directory {temp_dir} {tex_file}"
+                    raise Exception(error_msg)
             
             # Move PDF to output directory
             pdf_path = temp_path / "resume.pdf"
             output_path = self.output_dir / output_filename
-            pdf_path.rename(output_path)
+            
+            # Use shutil.move() to handle cross-device moves
+            shutil.move(str(pdf_path), str(output_path))
             
             return str(output_path)
     

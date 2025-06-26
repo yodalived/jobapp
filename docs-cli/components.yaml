@@ -1,0 +1,82 @@
+components:
+  - name: "api"
+    path: "src/api"
+    type: "service"
+    description: "FastAPI backend with routers for auth, applications, files, and generator"
+    
+  - name: "core"
+    path: "src/core"
+    type: "service"
+    description: "Core utilities including auth, database, email, events, and Kafka client"
+    
+  - name: "agents"
+    path: "src/agents"
+    type: "service"
+    description: "AI agents for scraping, analysis, generation, and optimization"
+    
+  - name: "workflows"
+    path: "src/workflows"
+    type: "service"
+    description: "Multi-step workflow orchestration and engine for resume generation"
+    
+  - name: "generator"
+    path: "src/generator"
+    type: "service"
+    description: "Resume generation engine with LaTeX templates and LLM interface"
+    
+  - name: "storage"
+    path: "src/core/storage"
+    type: "service"
+    description: "Multi-backend storage system with local, MinIO, S3, and Azure backends"
+    
+  - name: "services"
+    path: "src/services"
+    type: "service"
+    description: "High-level service layer for file and storage operations"
+    
+  - name: "frontend"
+    path: "frontend/src"
+    type: "frontend"
+    description: "Next.js frontend with authentication, dashboard, and status pages"
+    
+  - name: "api-gateway"
+    path: "api-gateway"
+    type: "service"
+    description: "Go-based API gateway for Phase 2 scaling with health checks and config"
+    
+  - name: "personalization"
+    path: "src/personalization"
+    type: "service"
+    description: "User personalization and recommendation engine (Phase 2 component)"
+    
+  - name: "docs-cli"
+    path: "docs-cli"
+    type: "tool"
+    description: "Go CLI tool for automated documentation generation using Claude API"
+
+# Configuration
+include_patterns:
+  - "*.py"
+  - "*.go"
+  - "*.ts"
+  - "*.tsx"
+  - "*.js"
+  - "*.jsx"
+  - "*.tex"
+  - "*.yaml"
+  - "*.yml"
+  - "*.json"
+  - "*.md"
+
+exclude_patterns:
+  - "__pycache__/*"
+  - "*.pyc"
+  - "node_modules/*"
+  - ".next/*"
+  - "build/*"
+  - "dist/*"
+  - "*.log"
+  - ".env"
+  - ".env.local"
+  - "tsconfig.tsbuildinfo"
+  - "package-lock.json"

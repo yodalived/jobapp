@@ -1,6 +1,6 @@
 # src/api/models/schemas.py
-from pydantic import BaseModel, HttpUrl
-from typing import Optional, List, Dict, Any
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
 

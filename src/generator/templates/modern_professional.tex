@@ -24,16 +24,16 @@ right=0.5in]{geometry}              % specify right page margin
 % resume starts here
 \begin{document}
 % name
-\centerline{\Huge {{ name }}}
+\centerline{\Huge {{ name|latex_escape }}}
 \vspace{5pt}
 % contact information
 {% set contact_items = [] %}
 {% if email %}{% set _ = contact_items.append('\\href{mailto:' + email + '}{' + email + '}') %}{% endif %}
-{% if phone %}{% set _ = contact_items.append(phone) %}{% endif %}
-{% if portfolio %}{% set _ = contact_items.append('\\href{' + portfolio + '}{' + (portfolio_display|default(portfolio)) + '}') %}{% endif %}
-{% if github %}{% set _ = contact_items.append('\\href{' + github + '}{' + (github_display|default(github)) + '}') %}{% endif %}
-{% if linkedin %}{% set _ = contact_items.append('\\href{' + linkedin + '}{' + (linkedin_display|default('LinkedIn')) + '}') %}{% endif %}
-{% if location %}{% set _ = contact_items.append(location) %}{% endif %}
+{% if phone %}{% set _ = contact_items.append(phone|latex_escape) %}{% endif %}
+{% if portfolio %}{% set _ = contact_items.append('\\href{' + portfolio + '}{' + (portfolio_display|default(portfolio)|latex_escape) + '}') %}{% endif %}
+{% if github %}{% set _ = contact_items.append('\\href{' + github + '}{' + (github_display|default(github)|latex_escape) + '}') %}{% endif %}
+{% if linkedin %}{% set _ = contact_items.append('\\href{' + linkedin + '}{' + (linkedin_display|default('LinkedIn')|latex_escape) + '}') %}{% endif %}
+{% if location %}{% set _ = contact_items.append(location|latex_escape) %}{% endif %}
 {% if contact_items %}
 \centerline{{ '{' }}{{ contact_items|join(' | ') }}{{ '}' }}
 {% endif %}
@@ -41,14 +41,14 @@ right=0.5in]{geometry}              % specify right page margin
 % summary section
 {% if summary %}
 \section*{Summary}
-{{ summary }}
+{{ summary|latex_escape }}
 \vspace{-6.5pt}
 {% endif %}
 % skills section
 {% if skills %}
 \section*{Skills}
 {% for group_name, items in skills.items() %}
-\textbf{{ '{' }}{{ group_name }}:{{ '}' }} {{ items|join(', ') }}{% if not loop.last %} \\{% endif %}
+\textbf{{ '{' }}{{ group_name|latex_escape }}:{{ '}' }} {{ items|map('latex_escape')|join(', ') }}{% if not loop.last %} \\{% endif %}
 {% endfor %}
 \vspace{-6.5pt}
 {% endif %}
@@ -56,11 +56,11 @@ right=0.5in]{geometry}              % specify right page margin
 {% if experience %}
 \section*{Experience}
 {% for job in experience %}
-\textbf{{ '{' }}{{ job.title }},{{ '}' }} {{ '{' }}{{ job.company }}{{ '}' }} -- {{ job.location }} \hfill {{ job.start_date }} -- {{ job.end_date|default('Present') }} \\
+\textbf{{ '{' }}{{ job.title|latex_escape }},{{ '}' }} {{ '{' }}{{ job.company|latex_escape }}{{ '}' }} -- {{ job.location|latex_escape }} \hfill {{ job.start_date|latex_escape }} -- {{ job.end_date|default('Present')|latex_escape }} \\
 \vspace{-9pt}
 \begin{itemize}
 {% for bullet in job.bullets %}
-  \item {{ bullet }}
+  \item {{ bullet|latex_escape }}
 {% endfor %}
 \end{itemize}
 {% if not loop.last %}\vspace{-6.5pt}{% endif %}

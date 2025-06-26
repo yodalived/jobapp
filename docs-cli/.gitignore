@@ -1,0 +1,97 @@
+# Binaries
+docs-cli
+docs-cli-*
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Coverage files
+*.out
+coverage.html
+
+# Go workspace file
+go.work
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Cache directories
+cache/
+.cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# API Keys and Secrets (SECURITY)
+model-config.yaml
+.env
+.env.local
+.env.production
+.env.staging
+secrets/
+*.key
+*.pem
+
+# Configuration with secrets
+*-secrets.yaml
+*-private.yaml
+
+# Build artifacts
+dist/
+build/
+bin/
+
+# Backup files
+*.bak
+*.backup
+backup/
+
+# Generated documentation (if auto-generated)
+docs/generated/
+
+# Package artifacts
+vendor/
+
+# Enterprise monitoring outputs
+metrics/
+monitoring/
+
+# Performance profiles
+*.prof
+pprof/
+
+# Local development overrides
+local-config.yaml
+dev-config.yaml
+
+# Docker artifacts
+.dockerignore
+docker-compose.override.yml
+
+# Kubernetes secrets
+k8s-secrets.yaml
+secrets.yaml

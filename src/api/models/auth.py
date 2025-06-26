@@ -26,6 +26,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     email_verified = Column(Boolean, default=False)
+    email_verification_token = Column(String, nullable=True)
     
     # SaaS features
     subscription_tier = Column(Enum(SubscriptionTier), default=SubscriptionTier.FREE)

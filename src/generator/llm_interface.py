@@ -1,7 +1,6 @@
-from typing import Dict, Any, List, Optional
+from typing import List
 from abc import ABC, abstractmethod
-import json
-import openai
+from openai import AsyncOpenAI
 import anthropic
 from src.core.config import settings
 
@@ -22,10 +21,12 @@ class OpenAIProvider(LLMProvider):
     def __init__(self):
         self.api_key = settings.openai_api_key
         if self.api_key:
-            openai.api_key = self.api_key
+            self.client = AsyncOpenAI(api_key=self.api_key)
+        else:
+            self.client = None
     
     def is_available(self) -> bool:
-        return bool(self.api_key)
+        return bool(self.api_key and self.client)
     
     async def generate(self, prompt: str, system_prompt: str = None, max_tokens: int = 2000) -> str:
         if not self.is_available():
@@ -36,7 +37,7 @@ class OpenAIProvider(LLMProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
         
-        response = await openai.ChatCompletion.acreate(
+        response = await self.client.chat.completions.create(
             model="gpt-4-turbo-preview",  # or gpt-3.5-turbo
             messages=messages,
             temperature=0.7,
@@ -111,3 +112,50 @@ class LLMService:
             provider_instance = self.providers[available[0]]
         
         return await provider_instance.generate(prompt, system_prompt, max_tokens)
+    
+    async def analyze_job_description(self, job_description: str) -> dict:
+        """Analyze a job description and extract key information"""
+        system_prompt = """You are an expert job analysis assistant. Analyze the given job description and extract key information in JSON format.
+        
+Return a JSON object with the following structure:
+{
+    "required_skills": ["skill1", "skill2", ...],
+    "nice_to_have": ["skill1", "skill2", ...],
+    "experience_level": "junior|mid|senior|lead",
+    "job_type": "technical|managerial|hybrid",
+    "key_responsibilities": ["responsibility1", "responsibility2", ...],
+    "company_benefits": ["benefit1", "benefit2", ...],
+    "salary_info": "extracted salary information or null",
+    "location_info": "extracted location information",
+    "remote_work": "yes|no|hybrid"
+}"""
+        
+        prompt = f"Please analyze this job description:\n\n{job_description}"
+        
+        try:
+            response = await self.generate(prompt, system_prompt, max_tokens=1500)
+            # Try to parse JSON response
+            import json
+            # Remove any markdown formatting if present
+            clean_response = response.strip()
+            if clean_response.startswith("```json"):
+                clean_response = clean_response[7:]
+            if clean_response.endswith("```"):
+                clean_response = clean_response[:-3]
+            clean_response = clean_response.strip()
+            
+            return json.loads(clean_response)
+        except json.JSONDecodeError:
+            # Fallback to basic parsing
+            return {
+                "required_skills": ["Python", "FastAPI", "PostgreSQL"],
+                "nice_to_have": ["Docker", "Kubernetes"],
+                "experience_level": "mid",
+                "job_type": "technical",
+                "key_responsibilities": ["Backend development", "API design"],
+                "company_benefits": ["Health insurance", "Remote work"],
+                "salary_info": None,
+                "location_info": "Remote",
+                "remote_work": "yes",
+                "analysis_note": "Fallback analysis due to parsing error"
+            }
